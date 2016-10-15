@@ -21,37 +21,6 @@ class QuizGame {
     currentQuestion = trivia.getRandomQuestion()
   }
   
-  func nextRound() {
-    if questionsAsked == questionsPerRound {
-      // Game is over
-      gameOver()
-    } else {
-      // Continue game
-      currentQuestion = getQuestion()
-    }
-  }
-  
-  func getResult() -> String {
-    return "Way to go!\nYou got \(correctQuestions) out of \(questionsPerRound) correct!"
-  }
-  
-  func gameOver() {
-    result = getResult()
-  }
-  // MARK: Helper Methods
-  
-  func loadNextRoundWithDelay(seconds: Int) {
-    // Converts a delay in seconds to nanoseconds as signed 64 bit integer
-    let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
-    // Calculates a time value to execute the method given current time and delay
-    let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
-    
-    // Executes the nextRound method at the dispatch time on the main queue
-    DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
-      self.nextRound()
-    }
-  }
-  
   func loadGameStartSound() {
     let pathToSoundFile = Bundle.main.path(forResource: "GameSound", ofType: "wav")
     let soundURL = URL(fileURLWithPath: pathToSoundFile!)
@@ -60,6 +29,30 @@ class QuizGame {
   
   func playGameStartSound() {
     AudioServicesPlaySystemSound(gameSound)
+  }
+  
+  func nextRound() {
+    if isGameOver() {
+      // Game is over
+      result = getResult()
+    } else {
+      // Continue game
+      currentQuestion = getQuestion()
+    }
+  }
+  
+  func startOver() {
+    questionsAsked = 0
+    correctQuestions = 0
+    nextRound()
+  }
+  
+  func getResult() -> String {
+    return "Way to go!\nYou got \(correctQuestions) out of \(questionsPerRound) correct!"
+  }
+  
+  func isGameOver() -> Bool {
+    return questionsAsked == questionsPerRound ? true : false
   }
   
   func getQuestion() -> [String: String] {

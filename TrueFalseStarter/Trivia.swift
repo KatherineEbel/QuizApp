@@ -12,7 +12,7 @@ import GameKit
 class Trivia {
   var indexOfSelectedQuestion: Int = 0
   
-  let trivia: [[String : String]] = [
+  let questions: [[String : String]] = [
       ["Question": "Only female koalas can whistle", "Answer": "False"],
       ["Question": "Blue whales are technically whales", "Answer": "True"],
       ["Question": "Camels are cannibalistic", "Answer": "False"],
@@ -20,8 +20,8 @@ class Trivia {
   ]
   
   func getRandomQuestion() -> [String : String] {
-    indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: trivia.count)
-    return trivia[indexOfSelectedQuestion]
+    indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: questions.count)
+    return questions[indexOfSelectedQuestion]
   }
   
   func isCorrect(answer: String, forQuestion question: [String : String]) -> Bool {
