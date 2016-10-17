@@ -23,8 +23,8 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
       super.viewDidLoad()
       // Start game
-      quizGame.loadGameStartSound()
-      quizGame.playGameStartSound()
+      quizGame.loadGameSounds()
+      quizGame.playSoundFor(eventName: "GameSound")
       displayQuestion()
       updateButtonTitles()
   }
@@ -44,8 +44,10 @@ class ViewController: UIViewController {
       let correctAnswer = options[answerIndex]
       if sender.currentTitle == correctAnswer {
         quizGame.correctQuestions += 1
+        quizGame.playSoundFor(eventName: "Correct")
         questionField.text = "Correct!"
       } else {
+        quizGame.playSoundFor(eventName: "Incorrect")
         questionField.text = "Sorry, wrong answer!"
       }
       loadNextRoundWithDelay(seconds: 2)
@@ -55,6 +57,7 @@ class ViewController: UIViewController {
       // Show the answer buttons
       toggleChoiceButtons()
       quizGame.startOver()
+      quizGame.playSoundFor(eventName: "GameSound")
       updateUI()
   }
   

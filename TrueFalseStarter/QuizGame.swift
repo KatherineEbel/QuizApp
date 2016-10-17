@@ -8,11 +8,11 @@
 import AudioToolbox
 
 class QuizGame {
-  let questionsPerRound = 10
+  let questionsPerRound = 5
   let trivia : Trivia
   var questionsAsked = 0
   var correctQuestions = 0
-  var gameSound: SystemSoundID = 0
+  var gameSounds: [String : SystemSoundID] = ["GameSound": 0, "Correct": 0, "Incorrect": 0, "Win": 0, "Lose": 0]
   var currentQuestion: [String : Any]
   var result : String!
   var usedQuestions : [[String : Any]] = []
@@ -37,22 +37,43 @@ class QuizGame {
   
   func nextRound() {
     if isGameOver() {
+      let hasWon = gameWon()
       // Game is over
-      result = getResult()
+      hasWon ? playSoundFor(eventName: "Win") : playSoundFor(eventName: "Lose")
+      result = getResult(won: hasWon)
     } else {
       // Continue game
       getQuestion()
     }
   }
   
-  func loadGameStartSound() {
-    let pathToSoundFile = Bundle.main.path(forResource: "GameSound", ofType: "wav")
-    let soundURL = URL(fileURLWithPath: pathToSoundFile!)
-    AudioServicesCreateSystemSoundID(soundURL as CFURL, &gameSound)
+  func loadGameSounds() {
+    for (name, _) in gameSounds {
+      let pathToSoundFile: String?
+      let soundURL: URL
+      switch name {
+        case "Win":
+          pathToSoundFile = Bundle.main.path(forResource: name, ofType: "mp3")
+      default:
+          pathToSoundFile = Bundle.main.path(forResource: name, ofType: "wav")
+      }
+      if let pathToSoundFile = pathToSoundFile {
+        soundURL = URL(fileURLWithPath: pathToSoundFile)
+        AudioServicesCreateSystemSoundID(soundURL as CFURL, &gameSounds[name]!)
+      } else {
+        print("Error loading sound: \(name)")
+      }
+    }
   }
   
-  func playGameStartSound() {
-    AudioServicesPlaySystemSound(gameSound)
+  func playSoundFor(eventName name: String) {
+    if let sound = gameSounds[name] {
+      AudioServicesPlaySystemSound(sound)
+    }
+  }
+  
+  func gameWon() -> Bool {
+    return Double(correctQuestions / questionsPerRound) >= 0.80
   }
   
   func startOver() {
@@ -62,8 +83,10 @@ class QuizGame {
     nextRound()
   }
   
-  func getResult() -> String {
-    return "Way to go!\nYou got \(correctQuestions) out of \(questionsPerRound) correct!"
+  func getResult(won: Bool) -> String {
+    let message = won ? "Way to go!\n" : "Sorry!\n"
+    let result = "You got \(correctQuestions) out of \(questionsPerRound) correct!"
+    return "\(message)\(result)"
   }
   
   func isGameOver() -> Bool {
