@@ -13,6 +13,7 @@ import AudioToolbox
 class ViewController: UIViewController {
     
   @IBOutlet weak var questionField: UILabel!
+  @IBOutlet weak var correctAnswerField: UILabel!
   @IBOutlet weak var choice1Button: UIButton!
   @IBOutlet weak var choice2Button: UIButton!
   @IBOutlet weak var choice3Button: UIButton!
@@ -49,8 +50,10 @@ class ViewController: UIViewController {
       } else {
         quizGame.playSoundFor(eventName: "Incorrect")
         questionField.text = "Sorry, wrong answer!"
+        correctAnswerField.text = "The correct answer was: \(correctAnswer)"
+        correctAnswerField.isHidden = false
       }
-      loadNextRoundWithDelay(seconds: 2)
+      loadNextRoundWithDelay(seconds: 3)
   }
   
   @IBAction func playAgain() {
@@ -77,6 +80,7 @@ class ViewController: UIViewController {
   }
   
   func displayQuestion() {
+      correctAnswerField.isHidden = true
       questionField.text = quizGame.currentQuestion["Question"] as! String?
       playAgainButton.isHidden = true
       updateButtonTitles()
