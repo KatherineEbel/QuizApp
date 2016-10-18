@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  QuizViewController.swift
 //  TrueFalseStarter
 //
 //  Created by Pasan Premaratne on 3/9/16.
@@ -20,14 +20,15 @@ class ViewController: UIViewController {
   @IBOutlet weak var choice4Button: UIButton!
   @IBOutlet weak var playAgainButton: UIButton!
   let quizGame = QuizGame(trivia: Trivia())
+  var questionTimer = Timer()
 
   override func viewDidLoad() {
       super.viewDidLoad()
       // Start game
       quizGame.loadGameSounds()
       quizGame.playSoundFor(eventName: "GameSound")
+      quizGame.nextRound()
       displayQuestion()
-      updateButtonTitles()
   }
 
   override func didReceiveMemoryWarning() {
@@ -36,35 +37,42 @@ class ViewController: UIViewController {
   }
   
   @IBAction func checkAnswer(_ sender: UIButton) {
-      // Increment the questions asked counter
-      quizGame.questionsAsked += 1
-      
-      let selectedQuestionDict = quizGame.currentQuestion
-      let options = selectedQuestionDict["Options"] as! [String]
-      let answerIndex = selectedQuestionDict["AnswerIndex"] as! Int
-      let correctAnswer = options[answerIndex]
-      if sender.currentTitle == correctAnswer {
-        quizGame.correctQuestions += 1
-        quizGame.playSoundFor(eventName: "Correct")
-        questionField.text = "Correct!"
-      } else {
-        quizGame.playSoundFor(eventName: "Incorrect")
-        questionField.text = "Sorry, wrong answer!"
-        correctAnswerField.text = "The correct answer was: \(correctAnswer)"
-        correctAnswerField.isHidden = false
-      }
-      loadNextRoundWithDelay(seconds: 3)
+    // Increment the questions asked counter
+    questionTimer.invalidate()
+    let selectedQuestionDict = quizGame.currentQuestion
+    if quizGame.trivia.isCorrect(answer: sender.currentTitle!, forQuestion: selectedQuestionDict) {
+      quizGame.correctQuestions += 1
+      quizGame.playSoundFor(eventName: "Correct")
+      questionField.text = "Correct!"
+    } else {
+      quizGame.playSoundFor(eventName: "Incorrect")
+      questionField.text = "Sorry, wrong answer!"
+      correctAnswerField.isHidden = false
+      correctAnswerField.text = quizGame.trivia.answerFor(question: quizGame.currentQuestion)
+    }
+    loadNextRoundWithDelay(seconds: 2)
   }
   
   @IBAction func playAgain() {
-      // Show the answer buttons
-      toggleChoiceButtons()
-      quizGame.startOver()
-      quizGame.playSoundFor(eventName: "GameSound")
-      updateUI()
+    // Show the answer buttons
+    toggleChoiceButtons()
+    quizGame.startOver()
+    quizGame.playSoundFor(eventName: "GameSound")
+    updateUI()
   }
   
   // MARK: Helper Methods
+  func startTimerForRound() {
+    let interval = quizGame.timeLimitPerQuestion
+    questionTimer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(ViewController.displayTimesUp), userInfo: nil, repeats: false)
+  }
+  
+  func displayTimesUp() {
+    questionField.text = "Sorry, Time's up!"
+    correctAnswerField.text = quizGame.trivia.answerFor(question: quizGame.currentQuestion)
+    correctAnswerField.isHidden = false
+    loadNextRoundWithDelay(seconds: 3)
+  }
   
   func loadNextRoundWithDelay(seconds: Int) {
     // Converts a delay in seconds to nanoseconds as signed 64 bit integer
@@ -80,10 +88,12 @@ class ViewController: UIViewController {
   }
   
   func displayQuestion() {
-      correctAnswerField.isHidden = true
-      questionField.text = quizGame.currentQuestion["Question"] as! String?
-      playAgainButton.isHidden = true
-      updateButtonTitles()
+    quizGame.questionsAsked += 1
+    playAgainButton.isHidden = true
+    correctAnswerField.isHidden = true
+    questionField.text = (quizGame.currentQuestion["Question"] as! String)
+    updateButtonTitles()
+    startTimerForRound()
   }
   
   func displayScore() {
@@ -117,4 +127,3 @@ class ViewController: UIViewController {
     }
   }
 }
-

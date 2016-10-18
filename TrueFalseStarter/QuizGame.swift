@@ -8,27 +8,29 @@
 import AudioToolbox
 
 class QuizGame {
-  let questionsPerRound = 5
+  let questionsPerRound : Double
   let trivia : Trivia
-  var questionsAsked = 0
-  var correctQuestions = 0
+  let timeLimitPerQuestion = 15.0
+  var questionsAsked : Double = 0
+  var correctQuestions : Double = 0
   var gameSounds: [String : SystemSoundID] = ["GameSound": 0, "Correct": 0, "Incorrect": 0, "Win": 0, "Lose": 0]
-  var currentQuestion: [String : Any]
+  var currentQuestion: [String : Any] = [:]
   var result : String!
   var usedQuestions : [[String : Any]] = []
   
   init(trivia: Trivia) {
     self.trivia = trivia
-    currentQuestion = trivia.getRandomQuestion()
+    questionsPerRound = Double(trivia.questions.count)
   }
-    
+  
+  // returns true if question is in usedQuestions array.
   func used(question: [String : Any]) -> Bool {
     return usedQuestions.contains(where: { (questionDict) -> Bool in
       questionDict["Question"] as? String == question["Question"] as? String
     })
   }
   
-  func getQuestion() {
+  func getNextQuestion() {
     repeat {
       currentQuestion = trivia.getRandomQuestion()
     } while used(question: currentQuestion)
@@ -39,11 +41,12 @@ class QuizGame {
     if isGameOver() {
       let hasWon = gameWon()
       // Game is over
+      print("Game over")
       hasWon ? playSoundFor(eventName: "Win") : playSoundFor(eventName: "Lose")
       result = getResult(won: hasWon)
     } else {
       // Continue game
-      getQuestion()
+      getNextQuestion()
     }
   }
   
@@ -73,7 +76,7 @@ class QuizGame {
   }
   
   func gameWon() -> Bool {
-    return Double(correctQuestions / questionsPerRound) >= 0.80
+    return correctQuestions / questionsPerRound >= 0.70
   }
   
   func startOver() {
@@ -84,8 +87,8 @@ class QuizGame {
   }
   
   func getResult(won: Bool) -> String {
-    let message = won ? "Way to go!\n" : "Sorry!\n"
-    let result = "You got \(correctQuestions) out of \(questionsPerRound) correct!"
+    let message = won ? "Way to go!\nYou got " : "Sorry!\nYou only got "
+    let result = "\(Int(correctQuestions)) correct!"
     return "\(message)\(result)"
   }
   

@@ -11,7 +11,6 @@ import GameKit
 
 class Trivia {
   var indexOfSelectedQuestion: Int = 0
-  
   let questions: [[String : Any]] = [
       ["Question": "This was the only US President to serve more than two consecutive terms.",
        "Options": ["George Washington", "Franklin D. Roosevelt", "Woodrow Wilson", "Andrew Jackson"],
@@ -50,7 +49,14 @@ class Trivia {
     return questions[indexOfSelectedQuestion]
   }
   
-  func isCorrect(answer: Int, forQuestion question: [String : Any]) -> Bool {
-    return answer == question["AnswerIndex"] as! Int
+  func isCorrect(answer: String, forQuestion question: [String : Any]) -> Bool {
+    let correctAnswerIdx = question["AnswerIndex"] as! Int
+    let options = question["Options"] as! [String]
+    return answer == options[correctAnswerIdx] 
+  }
+  
+  func answerFor(question: [String : Any]) -> String {
+    let options = question["Options"] as! [String]
+    return "The correct answer is: \(options[question["AnswerIndex"] as! Int])"
   }
 }
