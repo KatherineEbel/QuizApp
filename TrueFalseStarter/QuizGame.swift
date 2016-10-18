@@ -13,7 +13,7 @@ class QuizGame {
   let timeLimitPerQuestion = 15.0
   var questionsAsked : Double = 0
   var correctQuestions : Double = 0
-  var gameSounds: [String : SystemSoundID] = ["GameSound": 0, "Correct": 0, "Incorrect": 0, "Win": 0, "Lose": 0]
+  var gameSounds: [String : SystemSoundID] = ["GameSound": 0, "CorrectAnswer": 0, "IncorrectAnswer": 0, "Win": 0, "Lose": 0]
   var currentQuestion: [String : Any] = [:]
   var result : String!
   var usedQuestions : [[String : Any]] = []
@@ -23,6 +23,12 @@ class QuizGame {
     questionsPerRound = Double(trivia.questions.count)
   }
   
+  func start() {
+    loadGameSounds()
+    playSoundFor(eventName: "GameSound")
+    nextRound()
+  }
+  
   // returns true if question is in usedQuestions array.
   func used(question: [String : Any]) -> Bool {
     return usedQuestions.contains(where: { (questionDict) -> Bool in
@@ -30,7 +36,7 @@ class QuizGame {
     })
   }
   
-  func getNextQuestion() {
+  func nextQuestion() {
     repeat {
       currentQuestion = trivia.getRandomQuestion()
     } while used(question: currentQuestion)
@@ -39,14 +45,13 @@ class QuizGame {
   
   func nextRound() {
     if isGameOver() {
-      let hasWon = gameWon()
       // Game is over
-      print("Game over")
-      hasWon ? playSoundFor(eventName: "Win") : playSoundFor(eventName: "Lose")
-      result = getResult(won: hasWon)
+      let isWinner = gameWon()
+      isWinner ? playSoundFor(eventName: "Win") : playSoundFor(eventName: "Lose")
+      result = getResult(won: isWinner)
     } else {
       // Continue game
-      getNextQuestion()
+      nextQuestion()
     }
   }
   
@@ -57,7 +62,7 @@ class QuizGame {
       switch name {
         case "Win":
           pathToSoundFile = Bundle.main.path(forResource: name, ofType: "mp3")
-      default:
+        default:
           pathToSoundFile = Bundle.main.path(forResource: name, ofType: "wav")
       }
       if let pathToSoundFile = pathToSoundFile {
@@ -69,23 +74,28 @@ class QuizGame {
     }
   }
   
+  // evant names used for game sounds probably would have worked better as enums, but have not yet been covered
+  // in course, so wasn't sure if I was allowed to use.
   func playSoundFor(eventName name: String) {
     if let sound = gameSounds[name] {
       AudioServicesPlaySystemSound(sound)
     }
   }
   
+  // player wins with score greater or equal to 70%
   func gameWon() -> Bool {
     return correctQuestions / questionsPerRound >= 0.70
   }
   
-  func startOver() {
+  // reset properties and load next question
+  func playAgain() {
     questionsAsked = 0
     correctQuestions = 0
     usedQuestions = []
     nextRound()
   }
   
+  // returns a string with result of game based on whether player won or lost
   func getResult(won: Bool) -> String {
     let message = won ? "Way to go!\nYou got " : "Sorry!\nYou only got "
     let result = "\(Int(correctQuestions)) correct!"
