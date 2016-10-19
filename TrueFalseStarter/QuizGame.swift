@@ -11,12 +11,13 @@ class QuizGame {
   let questionsPerRound : Double
   let trivia : Trivia
   let timeLimitPerQuestion = 15.0
+  let winningScore = 0.70
   var questionsAsked : Double = 0
   var correctQuestions : Double = 0
   var gameSounds: [String : SystemSoundID] = ["GameSound": 0, "CorrectAnswer": 0, "IncorrectAnswer": 0, "Win": 0, "Lose": 0]
-  var currentQuestion: [String : Any] = [:]
+  var currentQuestion: QuizQuestion?
   var result : String!
-  var usedQuestions : [[String : Any]] = []
+  var usedQuestions : [QuizQuestion] = []
   
   init(trivia: Trivia) {
     self.trivia = trivia
@@ -30,17 +31,17 @@ class QuizGame {
   }
   
   // returns true if question is in usedQuestions array.
-  func used(question: [String : Any]) -> Bool {
-    return usedQuestions.contains(where: { (questionDict) -> Bool in
-      questionDict["Question"] as? String == question["Question"] as? String
+  func used(question: QuizQuestion) -> Bool {
+    return usedQuestions.contains(where: { (questionToCheck) -> Bool in
+      questionToCheck.question == question.question
     })
   }
   
   func nextQuestion() {
     repeat {
       currentQuestion = trivia.getRandomQuestion()
-    } while used(question: currentQuestion)
-    usedQuestions.append(currentQuestion)
+    } while used(question: currentQuestion!)
+    usedQuestions.append(currentQuestion!)
   }
   
   func nextRound() {
@@ -84,7 +85,7 @@ class QuizGame {
   
   // player wins with score greater or equal to 70%
   func gameWon() -> Bool {
-    return correctQuestions / questionsPerRound >= 0.70
+    return correctQuestions / questionsPerRound >= winningScore
   }
   
   // reset properties and load next question

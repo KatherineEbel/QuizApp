@@ -11,52 +11,42 @@ import GameKit
 
 class Trivia {
   var indexOfSelectedQuestion: Int = 0
-  let questions: [[String : Any]] = [
-      ["Question": "This was the only US President to serve more than two consecutive terms.",
-       "Options": ["George Washington", "Franklin D. Roosevelt", "Woodrow Wilson", "Andrew Jackson"],
-       "AnswerIndex": 1],
-      ["Question": "Which of the following countries has the most residents?",
-       "Options": ["Nigeria", "Russia", "Iran", "Vietnam"],
-       "AnswerIndex": 0],
-      ["Question": "In what year was the United Nations founded?",
-       "Options": ["1918", "1919", "1945", "1954"],
-       "AnswerIndex": 2],
-      ["Question": "The Titanic departed from the United Kingdom, where was it supposed to arrive?",
-       "Options": ["Paris", "Washington D.C.", "New York City", "Boston"],
-       "AnswerIndex": 2],
-      ["Question": "Which nation produces the most oil?",
-       "Options": ["Iran", "Iraq", "Brazil", "Canada"],
-       "AnswerIndex": 3],
-      ["Question": "Which country has most recently won consecutive World Cups in Soccer?",
-       "Options": ["Italy", "Brazil", "Argentina", "Spain"],
-       "AnswerIndex": 1],
-      ["Question": "Which of the following rivers is longest?",
-       "Options": ["Yangtze", "Mississippi", "Congo", "Mekong"],
-       "AnswerIndex": 1],
-      ["Question": "Which city is the oldest?",
-       "Options": ["Mexico City", "Cape Town", "San Juan", "Sydney"],
-       "AnswerIndex": 0],
-      ["Question": "Which country was the first to allow women to vote in national elections?",
-       "Options": ["Poland", "United States", "Sweden", "Senegal"],
-       "AnswerIndex": 0],
-      ["Question": "Which of these countries won the most medals in the 2012 Summer Games?",
-       "Options": ["France", "Germany", "Japan", "Great Britain"],
-       "AnswerIndex": 3]
+  let questions : [QuizQuestion] = [
+    QuizQuestion(question: "This was the only US President to serve more than two consecutive terms.",
+      options: ["George Washington", "Franklin D. Roosevelt", "Woodrow Wilson", "Andrew Jackson"],
+      correctOption: 1),
+    QuizQuestion(question: "Which of the following countries has the most residents?",
+      options: ["Nigeria", "Russia", "Iran", "Vietnam"],
+      correctOption: 0),
+    QuizQuestion(question: "In what year was the United Nations founded?",
+      options: ["1918", "1919", "1945", "1954"],
+      correctOption: 2),
+    QuizQuestion(question: "The Titanic departed from the United Kingdom, where was it supposed to arrive?",
+      options: ["Paris", "Washington D.C.", "New York City", "Boston"],
+      correctOption: 2),
+    QuizQuestion(question: "Which nation produces the most oil?",
+      options: ["Iran", "Iraq", "Brazil", "Canada"],
+      correctOption: 3),
+    QuizQuestion(question: "Which country has most recently won consecutive World Cups in Soccer?",
+      options: ["Italy", "Brazil", "Argentina", "Spain"],
+      correctOption: 1),
+    QuizQuestion(question: "Which of the following rivers is longest?",
+      options: ["Yangtze", "Mississippi", "Congo", "Mekong"],
+      correctOption: 1),
+    QuizQuestion(question: "Which city is the oldest?",
+      options: ["Mexico City", "Cape Town", "San Juan", "Sydney"],
+      correctOption: 0),
+    QuizQuestion(question: "Which country was the first to allow women to vote in national elections?",
+      options: ["Poland", "United States", "Sweden", "Senegal"],
+      correctOption: 0),
+    QuizQuestion(question: "Which of these countries won the most medals in the 2012 Summer Games?",
+      options: ["France", "Germany", "Japan", "Great Britain"],
+      correctOption: 3),
   ]
   
-  func getRandomQuestion() -> [String : Any] {
+  func getRandomQuestion() -> QuizQuestion {
     indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: questions.count)
     return questions[indexOfSelectedQuestion]
   }
   
-  func isCorrect(answer: String, forQuestion question: [String : Any]) -> Bool {
-    let correctAnswerIdx = question["AnswerIndex"] as! Int
-    let options = question["Options"] as! [String]
-    return answer == options[correctAnswerIdx] 
-  }
-  
-  func answerFor(question: [String : Any]) -> String {
-    let options = question["Options"] as! [String]
-    return "The correct answer is: \(options[question["AnswerIndex"] as! Int])"
-  }
 }

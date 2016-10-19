@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		27CBC3621DB188CC00AF7362 /* QuizGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CBC3611DB188CC00AF7362 /* QuizGame.swift */; };
 		27CBC3641DB1895900AF7362 /* Trivia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CBC3631DB1895900AF7362 /* Trivia.swift */; };
+		440F9E471DB7BF25002EE479 /* QuizQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440F9E461DB7BF25002EE479 /* QuizQuestion.swift */; };
 		445246B21DB4F08C0049A3DD /* CorrectAnswer.wav in Resources */ = {isa = PBXBuildFile; fileRef = 445246AE1DB4F08C0049A3DD /* CorrectAnswer.wav */; };
 		445246B31DB4F08C0049A3DD /* IncorrectAnswer.wav in Resources */ = {isa = PBXBuildFile; fileRef = 445246AF1DB4F08C0049A3DD /* IncorrectAnswer.wav */; };
 		445246B41DB4F08C0049A3DD /* Lose.wav in Resources */ = {isa = PBXBuildFile; fileRef = 445246B01DB4F08C0049A3DD /* Lose.wav */; };
@@ -24,6 +25,7 @@
 /* Begin PBXFileReference section */
 		27CBC3611DB188CC00AF7362 /* QuizGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuizGame.swift; sourceTree = "<group>"; };
 		27CBC3631DB1895900AF7362 /* Trivia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Trivia.swift; sourceTree = "<group>"; };
+		440F9E461DB7BF25002EE479 /* QuizQuestion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuizQuestion.swift; sourceTree = "<group>"; };
 		445246AE1DB4F08C0049A3DD /* CorrectAnswer.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = CorrectAnswer.wav; sourceTree = "<group>"; };
 		445246AF1DB4F08C0049A3DD /* IncorrectAnswer.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = IncorrectAnswer.wav; sourceTree = "<group>"; };
 		445246B01DB4F08C0049A3DD /* Lose.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Lose.wav; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 			children = (
 				97093D3B1C913506001275BC /* AppDelegate.swift */,
 				27CBC3611DB188CC00AF7362 /* QuizGame.swift */,
+				440F9E461DB7BF25002EE479 /* QuizQuestion.swift */,
 				27CBC3631DB1895900AF7362 /* Trivia.swift */,
 				97093D3D1C913506001275BC /* QuizViewController.swift */,
 				97093D3F1C913506001275BC /* Main.storyboard */,
@@ -175,6 +178,7 @@
 				97093D3E1C913506001275BC /* QuizViewController.swift in Sources */,
 				97093D3C1C913506001275BC /* AppDelegate.swift in Sources */,
 				27CBC3641DB1895900AF7362 /* Trivia.swift in Sources */,
+				440F9E471DB7BF25002EE479 /* QuizQuestion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

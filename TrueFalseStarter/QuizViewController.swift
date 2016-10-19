@@ -17,6 +17,9 @@ class QuizViewController: UIViewController {
   @IBOutlet weak var choice3Button: UIButton!
   @IBOutlet weak var choice4Button: UIButton!
   @IBOutlet weak var playAgainButton: UIButton!
+  let correctResponseMessage = "Correct!"
+  let incorrectResponseMessage = "Sorry, wrong answer!"
+  let timeUpMessage = "Sorry, time's up!"
   let quizGame = QuizGame(trivia: Trivia())
   var questionTimer = Timer()
 
@@ -35,19 +38,20 @@ class QuizViewController: UIViewController {
   @IBAction func checkAnswer(_ sender: UIButton) {
     // Increment the questions asked counter
     questionTimer.invalidate()
-    let selectedQuestionDict = quizGame.currentQuestion
-    let isCorrectAnswer =  quizGame.trivia.isCorrect(answer: sender.currentTitle!, forQuestion: selectedQuestionDict)
-    if isCorrectAnswer {
-      quizGame.correctQuestions += 1
-      quizGame.playSoundFor(eventName: "CorrectAnswer")
-      questionField.text = "Correct!"
-    } else {
-      quizGame.playSoundFor(eventName: "IncorrectAnswer")
-      questionField.text = "Sorry, wrong answer!"
-      correctAnswerField.isHidden = false
-      correctAnswerField.text = quizGame.trivia.answerFor(question: quizGame.currentQuestion)
+    if let currentQuestion = quizGame.currentQuestion {
+      let isCorrectAnswer = currentQuestion.correctAnswer == sender.currentTitle!
+      if isCorrectAnswer {
+        quizGame.correctQuestions += 1
+        quizGame.playSoundFor(eventName: "CorrectAnswer")
+        questionField.text = correctResponseMessage
+      } else {
+        quizGame.playSoundFor(eventName: "IncorrectAnswer")
+        questionField.text = incorrectResponseMessage
+        correctAnswerField.isHidden = false
+        correctAnswerField.text = currentQuestion.displayCorrectAnswer()
+      }
+      loadNextRoundWithDelay(seconds: 2)
     }
-    loadNextRoundWithDelay(seconds: 2)
   }
   
   @IBAction func playAgain() {
@@ -60,17 +64,19 @@ class QuizViewController: UIViewController {
   
   // MARK: Helper Methods
   func startTimerForRound() {
-    let interval = quizGame.timeLimitPerQuestion
-    questionTimer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(QuizViewController.displayTimesUp), userInfo: nil, repeats: false)
+    let timeLimit = quizGame.timeLimitPerQuestion
+    questionTimer = Timer.scheduledTimer(timeInterval: timeLimit, target: self, selector: #selector(QuizViewController.displayTimesUp), userInfo: nil, repeats: false)
   }
   
   // handle when timer is up, show correct answer
   func displayTimesUp() {
-    questionField.text = "Sorry, Time's up!"
+    questionField.text = timeUpMessage
     quizGame.playSoundFor(eventName: "IncorrectAnswer")
-    correctAnswerField.text = quizGame.trivia.answerFor(question: quizGame.currentQuestion)
-    correctAnswerField.isHidden = false
-    loadNextRoundWithDelay(seconds: 3)
+    if let currentQuestion = quizGame.currentQuestion {
+      correctAnswerField.text = currentQuestion.displayCorrectAnswer()
+      correctAnswerField.isHidden = false
+      loadNextRoundWithDelay(seconds: 3)
+    }
   }
   
   func loadNextRoundWithDelay(seconds: Int) {
@@ -91,9 +97,11 @@ class QuizViewController: UIViewController {
     quizGame.questionsAsked += 1
     playAgainButton.isHidden = true
     correctAnswerField.isHidden = true
-    questionField.text = (quizGame.currentQuestion["Question"] as! String)
-    updateButtonTitles()
-    startTimerForRound()
+    if let currentQuestion = quizGame.currentQuestion {
+      questionField.text = currentQuestion.question
+      updateButtonTitles()
+      startTimerForRound()
+    }
   }
  
   // hide answer buttons and display game result
@@ -125,9 +133,10 @@ class QuizViewController: UIViewController {
   
   func updateButtonTitles() {
     let buttons = [choice1Button, choice2Button, choice3Button, choice4Button]
-    let options = quizGame.currentQuestion["Options"] as! [String]
-    for idx in 0..<buttons.count {
-      buttons[idx]?.setTitle(options[idx], for: .normal)
+    if let currentQuestion = quizGame.currentQuestion {
+      for index in 0..<buttons.count {
+        buttons[index]?.setTitle(currentQuestion.options[index], for: .normal)
+      }
     }
   }
 }
