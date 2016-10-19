@@ -7,10 +7,8 @@
 //
 
 import UIKit
-import GameKit
-import AudioToolbox
 
-class ViewController: UIViewController {
+class QuizViewController: UIViewController {
     
   @IBOutlet weak var questionField: UILabel!
   @IBOutlet weak var correctAnswerField: UILabel!
@@ -63,7 +61,7 @@ class ViewController: UIViewController {
   // MARK: Helper Methods
   func startTimerForRound() {
     let interval = quizGame.timeLimitPerQuestion
-    questionTimer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(ViewController.displayTimesUp), userInfo: nil, repeats: false)
+    questionTimer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(QuizViewController.displayTimesUp), userInfo: nil, repeats: false)
   }
   
   // handle when timer is up, show correct answer
