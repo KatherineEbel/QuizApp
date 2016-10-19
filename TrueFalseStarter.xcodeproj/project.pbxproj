@@ -81,14 +81,14 @@
 			isa = PBXGroup;
 			children = (
 				97093D3B1C913506001275BC /* AppDelegate.swift */,
+				27CBC3611DB188CC00AF7362 /* QuizGame.swift */,
+				27CBC3631DB1895900AF7362 /* Trivia.swift */,
 				97093D3D1C913506001275BC /* QuizViewController.swift */,
 				97093D3F1C913506001275BC /* Main.storyboard */,
 				97093D421C913506001275BC /* Assets.xcassets */,
 				97093D441C913506001275BC /* LaunchScreen.storyboard */,
 				97093D471C913506001275BC /* Info.plist */,
 				445246AD1DB4F06D0049A3DD /* Sounds */,
-				27CBC3611DB188CC00AF7362 /* QuizGame.swift */,
-				27CBC3631DB1895900AF7362 /* Trivia.swift */,
 			);
 			path = TrueFalseStarter;
 			sourceTree = "<group>";
