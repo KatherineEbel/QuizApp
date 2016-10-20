@@ -18,9 +18,9 @@ class QuizViewController: UIViewController {
   @IBOutlet weak var choice4Button: UIButton!
   @IBOutlet weak var playAgainButton: UIButton!
   let correctResponseMessage = "Correct!"
-  let incorrectResponseMessage = "Sorry, wrong answer!"
+  let incorrectResponseMessage = "Sorry, that's not it!"
   let timeUpMessage = "Sorry, time's up!"
-  let quizGame = QuizGame(trivia: Trivia())
+  let quizGame = QuizGame()
   var questionTimer = Timer()
 
   override func viewDidLoad() {
@@ -40,29 +40,31 @@ class QuizViewController: UIViewController {
     questionTimer.invalidate()
     if let currentQuestion = quizGame.currentQuestion {
       let isCorrectAnswer = currentQuestion.correctAnswer == sender.currentTitle!
-      if isCorrectAnswer {
-        quizGame.correctQuestions += 1
-        quizGame.playSoundFor(eventName: "CorrectAnswer")
-        questionField.text = correctResponseMessage
-      } else {
-        quizGame.playSoundFor(eventName: "IncorrectAnswer")
-        questionField.text = incorrectResponseMessage
-        correctAnswerField.isHidden = false
-        correctAnswerField.text = currentQuestion.displayCorrectAnswer()
-      }
-      loadNextRoundWithDelay(seconds: 2)
+      handleResponseFor(isCorrectAnswer: isCorrectAnswer)
     }
   }
   
+  
   @IBAction func playAgain() {
-    // Show the answer buttons
-    toggleChoiceButtons()
-    quizGame.playAgain()
-    quizGame.playSoundFor(eventName: "GameSound")
-    updateUI()
+    if quizGame.isGameOver() {
+      playAgainButton.setTitle("Play Again", for: .normal)
+      quizGame.end()
+      quizGame.playAgain()
+      displayScore()
+    } else {
+      playAgainButton.setTitle("Next Question", for: .normal)
+      loadNextRound()
+    }
   }
   
   // MARK: Helper Methods
+  func handleResponseFor(isCorrectAnswer: Bool) {
+    highlightCorrectOptionButton()
+    isCorrectAnswer ? handleCorrectAnswer() : handleIncorrectAnswer()
+    correctAnswerField.isHidden = false
+    playAgainButton.isHidden = false
+  }
+  
   func startTimerForRound() {
     let timeLimit = quizGame.timeLimitPerQuestion
     questionTimer = Timer.scheduledTimer(timeInterval: timeLimit, target: self, selector: #selector(QuizViewController.displayTimesUp), userInfo: nil, repeats: false)
@@ -71,71 +73,76 @@ class QuizViewController: UIViewController {
   // handle when timer is up, show correct answer
   func displayTimesUp() {
     questionField.text = timeUpMessage
-    quizGame.playSoundFor(eventName: "IncorrectAnswer")
-    if let currentQuestion = quizGame.currentQuestion {
-      correctAnswerField.text = currentQuestion.displayCorrectAnswer()
-      correctAnswerField.isHidden = false
-      loadNextRoundWithDelay(seconds: 3)
-    }
+    handleResponseFor(isCorrectAnswer: false)
   }
   
-  func loadNextRoundWithDelay(seconds: Int) {
-    // Converts a delay in seconds to nanoseconds as signed 64 bit integer
-    let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
-    // Calculates a time value to execute the method given current time and delay
-    let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
-    
-    // Executes the nextRound method at the dispatch time on the main queue
-    DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
-      self.quizGame.nextRound()
-      self.updateUI()
-    }
+  func loadNextRound() {
+    quizGame.getNextQuestion()
+    displayQuestion()
   }
+  
   
   // update buttons/labels for current quiz question, start timer for current round
   func displayQuestion() {
+    quizGame.playSoundFor(eventName: "GameSound")
     quizGame.questionsAsked += 1
     playAgainButton.isHidden = true
     correctAnswerField.isHidden = true
     if let currentQuestion = quizGame.currentQuestion {
       questionField.text = currentQuestion.question
-      updateButtonTitles()
+      updateOptionButtons()
       startTimerForRound()
     }
   }
  
   // hide answer buttons and display game result
   func displayScore() {
-      // Hide the answer buttons and answerTextField
-      correctAnswerField.isHidden = true
-      toggleChoiceButtons()
-      // Display play again button
       playAgainButton.isHidden = false
       questionField.text = quizGame.result
   }
- 
-  // updates buttons and labels dependant on whether game is over or not
-  func updateUI() {
-    if quizGame.isGameOver() {
-      displayScore()
-    } else {
-      displayQuestion()
-    }
+  
+  // allow quizgame to respond for correct answer and adjust UI
+  func handleCorrectAnswer() {
+    quizGame.correctQuestions += 1
+    quizGame.playSoundFor(eventName: "CorrectAnswer")
+    correctAnswerField.textColor = UIColor(red: 2/255.0, green: 119/255.0, blue: 116/255.0, alpha: 1.0)
+    correctAnswerField.text = correctResponseMessage
   }
   
-  // displays or hides buttons based on current state
-  func toggleChoiceButtons() {
-    let buttons = [choice1Button, choice2Button, choice3Button, choice4Button]
-    for button in buttons {
-      button?.isHidden = (button?.isHidden)! ? false : true
-    }
+  func handleIncorrectAnswer() {
+    quizGame.playSoundFor(eventName: "IncorrectAnswer")
+    correctAnswerField.textColor = UIColor(red: 222/255.0, green: 146/255.0, blue: 93/255.0, alpha: 1.0)
+    correctAnswerField.text = incorrectResponseMessage
   }
   
-  func updateButtonTitles() {
+  func updateOptionButtons() {
     let buttons = [choice1Button, choice2Button, choice3Button, choice4Button]
     if let currentQuestion = quizGame.currentQuestion {
       for index in 0..<buttons.count {
+        // restore button initial colors and update title for new question
+        buttons[index]?.backgroundColor = UIColor(red: 12/255.0, green: 121/255.0, blue: 150/255.0, alpha: 1.0)
+        buttons[index]?.tintColor = UIColor.white
+        buttons[index]?.isEnabled = true
+        buttons[index]?.isUserInteractionEnabled = true
         buttons[index]?.setTitle(currentQuestion.options[index], for: .normal)
+      }
+    }
+  }
+  
+  // after question is answered the buttons will change colors to display correct answer
+  // the only button that can respond to touches at this point is the playAgain/next button
+  func highlightCorrectOptionButton() {
+    if let currentQuestion = quizGame.currentQuestion {
+      let buttons = [choice1Button, choice2Button, choice3Button, choice4Button]
+      for button in buttons {
+        button?.isUserInteractionEnabled = false
+        if button?.currentTitle == currentQuestion.correctAnswer {
+          // correct answer button will be white with dark blue text
+          button?.backgroundColor = UIColor.white
+          button?.tintColor = UIColor(red: 8/255.0, green: 43/255.0, blue: 62/255.0, alpha: 1.0)
+        } else {
+          button?.isEnabled = false
+        }
       }
     }
   }

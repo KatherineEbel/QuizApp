@@ -19,15 +19,14 @@ class QuizGame {
   var result : String!
   var usedQuestions : [QuizQuestion] = []
   
-  init(trivia: Trivia) {
-    self.trivia = trivia
+  init() {
+    trivia = Trivia()
     questionsPerRound = Double(trivia.questions.count)
   }
   
   func start() {
     loadGameSounds()
-    playSoundFor(eventName: "GameSound")
-    nextRound()
+    getNextQuestion()
   }
   
   // returns true if question is in usedQuestions array.
@@ -37,25 +36,22 @@ class QuizGame {
     })
   }
   
-  func nextQuestion() {
+  func getNextQuestion() {
     repeat {
-      currentQuestion = trivia.getRandomQuestion()
+      currentQuestion = trivia.randomQuestion
     } while used(question: currentQuestion!)
     usedQuestions.append(currentQuestion!)
   }
   
-  func nextRound() {
-    if isGameOver() {
-      // Game is over
-      let isWinner = gameWon()
-      isWinner ? playSoundFor(eventName: "Win") : playSoundFor(eventName: "Lose")
-      result = getResult(won: isWinner)
-    } else {
-      // Continue game
-      nextQuestion()
-    }
+  // plays appropriate tune and set results message depending on win or loss
+  func end() {
+    let isWinner = isPlayerWinner()
+    isWinner ?
+      playSoundFor(eventName: "Win") : playSoundFor(eventName: "Lose")
+    result = getResult(isPlayerWinner: isWinner)
   }
   
+  // each sound name is stored as a key in the gameSounds variable. This creates system sounds for each type
   func loadGameSounds() {
     for (name, _) in gameSounds {
       let pathToSoundFile: String?
@@ -84,21 +80,20 @@ class QuizGame {
   }
   
   // player wins with score greater or equal to 70%
-  func gameWon() -> Bool {
+  func isPlayerWinner() -> Bool {
     return correctQuestions / questionsPerRound >= winningScore
   }
   
-  // reset properties and load next question
+  // reset properties 
   func playAgain() {
     questionsAsked = 0
     correctQuestions = 0
     usedQuestions = []
-    nextRound()
   }
   
   // returns a string with result of game based on whether player won or lost
-  func getResult(won: Bool) -> String {
-    let message = won ? "Way to go!\nYou got " : "Sorry!\nYou only got "
+  func getResult(isPlayerWinner: Bool) -> String {
+    let message = isPlayerWinner ? "Way to go!\nYou got " : "Sorry!\nYou only got "
     let result = "\(Int(correctQuestions)) correct!"
     return "\(message)\(result)"
   }

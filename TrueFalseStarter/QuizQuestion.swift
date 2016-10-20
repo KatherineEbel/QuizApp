@@ -12,12 +12,4 @@ struct QuizQuestion {
   var correctAnswer : String {
     return options[correctOption]
   }
-  
-  func isCorrect(answer: String) -> Bool {
-    return answer == correctAnswer
-  }
-  
-  func displayCorrectAnswer() -> String {
-    return "The correct answer is: \(correctAnswer)"
-  }
 }

@@ -9,8 +9,7 @@
 import Foundation
 import GameKit
 
-class Trivia {
-  var indexOfSelectedQuestion: Int = 0
+struct Trivia {
   let questions : [QuizQuestion] = [
     QuizQuestion(question: "This was the only US President to serve more than two consecutive terms.",
       options: ["George Washington", "Franklin D. Roosevelt", "Woodrow Wilson", "Andrew Jackson"],
@@ -44,9 +43,8 @@ class Trivia {
       correctOption: 3),
   ]
   
-  func getRandomQuestion() -> QuizQuestion {
-    indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: questions.count)
+  var randomQuestion : QuizQuestion {
+    let indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: questions.count)
     return questions[indexOfSelectedQuestion]
   }
-  
 }
