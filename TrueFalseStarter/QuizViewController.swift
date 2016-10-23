@@ -118,31 +118,46 @@ class QuizViewController: UIViewController {
   func updateOptionButtons() {
     let buttons = [choice1Button, choice2Button, choice3Button, choice4Button]
     if let currentQuestion = quizGame.currentQuestion {
-      for index in 0..<buttons.count {
-        // restore button initial colors and update title for new question
-        buttons[index]?.backgroundColor = UIColor(red: 12/255.0, green: 121/255.0, blue: 150/255.0, alpha: 1.0)
-        buttons[index]?.tintColor = UIColor.white
-        buttons[index]?.isEnabled = true
-        buttons[index]?.isUserInteractionEnabled = true
-        buttons[index]?.setTitle(currentQuestion.options[index], for: .normal)
-      }
+      // restore button initial colors and update title for new question
+      configure(buttons: buttons, forQuestion: currentQuestion)
     }
   }
   
-  // after question is answered the buttons will change colors to display correct answer
+  // after question is answered the button with the correct answer will change colors
   // the only button that can respond to touches at this point is the playAgain/next button
   func highlightCorrectOptionButton() {
     if let currentQuestion = quizGame.currentQuestion {
       let buttons = [choice1Button, choice2Button, choice3Button, choice4Button]
       for button in buttons {
-        button?.isUserInteractionEnabled = false
-        if button?.currentTitle == currentQuestion.correctAnswer {
-          // correct answer button will be white with dark blue text
-          button?.backgroundColor = UIColor.white
-          button?.tintColor = UIColor(red: 8/255.0, green: 43/255.0, blue: 62/255.0, alpha: 1.0)
-        } else {
-          button?.isEnabled = false
+        if let button = button {
+          if button.currentTitle == currentQuestion.correctAnswer {
+            configureForCorrectAnswer(button: button)
+          } else {
+            button.isEnabled = false
+          }
         }
+      }
+    }
+  }
+  
+  func configureForCorrectAnswer(button: UIButton?) {
+    // correct answer button will be white with dark blue text
+    if let button = button {
+      // disable user interaction so I can still show white color for button
+      button.isUserInteractionEnabled = false
+      button.backgroundColor = UIColor.white
+      button.tintColor = UIColor(red: 8/255.0, green: 43/255.0, blue: 62/255.0, alpha: 1.0)
+    }
+  }
+  
+  func configure(buttons: [UIButton?], forQuestion question: QuizQuestion) {
+    for (index, button) in buttons.enumerated() {
+      if let button = button {
+        button.backgroundColor = UIColor(red: 12/255.0, green: 121/255.0, blue: 150/255.0, alpha: 1.0)
+        button.tintColor = UIColor.white
+        button.isEnabled = true
+        button.isUserInteractionEnabled = true
+        button.setTitle(question.options[index], for: .normal)
       }
     }
   }

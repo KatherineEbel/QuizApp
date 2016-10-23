@@ -14,6 +14,8 @@ class QuizGame {
   let winningScore = 0.70
   var questionsAsked : Double = 0
   var correctQuestions : Double = 0
+  // the gameSounds would probably work better using enums but I don't know if we were allowed to use them,
+  // since they weren't covered in the program yet...
   var gameSounds: [String : SystemSoundID] = ["GameSound": 0, "CorrectAnswer": 0, "IncorrectAnswer": 0, "Win": 0, "Lose": 0]
   var currentQuestion: QuizQuestion?
   var result : String!
@@ -35,7 +37,9 @@ class QuizGame {
       questionToCheck.question == question.question
     })
   }
-  
+ 
+  // will keep getting random question if the currentQuestion is in the usedQuestions array
+  // this way the questions won't be repeated.
   func getNextQuestion() {
     repeat {
       currentQuestion = trivia.randomQuestion
