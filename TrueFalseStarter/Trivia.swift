@@ -43,6 +43,7 @@ struct Trivia {
       correctOption: 3),
   ]
   
+  // computed property to get a random question from questions array
   var randomQuestion : QuizQuestion {
     let indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: questions.count)
     return questions[indexOfSelectedQuestion]
